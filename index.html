@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>hihi!!!</title>
+	<style>
+		body {
+			background-color: black;
+			color: lime; /* Classic green text */
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			height: 100vh;
+			flex-direction: column;
+			margin: 0;
+			font-family: "Fixedsys", monospace;
+		}
+
+		@keyframes fireText {
+			0% { color: #FF4500; }
+			50% { color: #FFFF00; }
+			100% { color: #FF4500; }
+		}
+
+		@keyframes blinkText {
+			  0% { opacity: 0.98; }
+			 80% { opacity: 0.89; }
+			 85% { opacity: 0.618; }
+			 90% { opacity: 0.777; }
+			100% { opacity: 0.98; }
+		}
+
+		@keyframes elevatorText {
+			0%, 43%, 100%{
+				bottom: 0;
+			}
+			50%, 93% {
+				bottom: 0.96em;
+			}
+		}
+		@keyframes elevatorTextSecret {
+			93%{
+				transform: rotate(180deg);
+			}
+		}
+		@keyframes jumpText {
+			0%, 49% {
+				transform: translateY(-2px);
+			}
+			50%, 100% {
+				transform: translateY(3px);
+			}
+		}
+
+		.jumpText {
+			animation: jumpText 1s steps(1) infinite;
+		}
+
+		.fireText {
+			animation: fireText 1s infinite;
+		}
+
+		.blinkText {
+			animation: blinkText 10s infinite;
+		}
+
+		.elevatorText {
+			height: 1.2em;
+			overflow: hidden;
+			border: 1px solid limegreen;
+			animation: elevatorTextSecret 4.6s steps(1) infinite;
+		}
+
+		.elevatorText div {
+			height: 1.1em;
+			display: flex;
+			position: relative;
+			align-items: center;
+			justify-content: center;
+			animation: elevatorText 4.6s linear infinite, elevatorTextSecret 4.6s steps(1) infinite;
+		}
+
+		#grid {
+			display: grid;
+			grid-template-columns: repeat(11, 1fr);
+			grid-template-rows: repeat(11, 1fr);
+			width: 80%;
+			height: 50%;
+			margin-top: 20px;
+			margin-bottom: 20px;
+		}
+
+		.grid-item {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			border: 1px solid lime;
+			width: 100%;
+			height: 100%;
+		}
+
+		.ruler-item {
+			background-color: #333;
+		}
+
+		.clickable-item {
+			cursor: pointer;
+			background-color: #222;
+		}
+
+		.clickable-item.clicked {
+			background-color: #555;
+		}
+
+		marquee {
+			font-size: 24px;
+		}
+	</style>
+</head>
+<body>
+
+	<marquee behavior="alternate" class="fireText">WELCOME!!!</marquee>
+	<h1 class="blinkText">WELCOME</h1>
+	<div id="debug"></div>
+	<marquee
+		direction="down"
+		width="250"
+		height="200"
+		behavior="alternate"
+		style="border:solid">
+		<marquee behavior="alternate">
+&nbsp;&nbsp;(&nbsp;(<br/>
+&nbsp;&nbsp;)&nbsp;)<br/>
+.........<br/>
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|]<br/>
+\&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /<br/>
+&nbsp;`-----`<br/>
+		</marquee>
+	</marquee>
+	<marquee class="jumpText">
+	 &nbsp;&nbsp;_&nbsp;&nbsp;_<br/>
+	 >(.)__)<br/>
+	 &nbsp;(___/)"<br/>
+	</marquee>
+
+	<div id="grid"></div>
+	<div class="elevatorText">
+		<div id="counter"></div>
+		<div>Thank you</div>
+	</div>
+
+	<script>
+		function sha1(data) {
+			var K = [0x5A827999, 0x6ED9EBA1, 0x8F1BBCDC, 0xCA62C1D6];
+			var H = [0x67452301, 0xEFCDAB89, 0x98BADCFE, 0x10325476, 0xC3D2E1F0];
+			var words = [];
+			var data_len = data.length;
+
+			data.push(0x80);
+			while (data.length % 64 !== 56) {
+				data.push(0);
+			}
+
+			for (var i = 0; i < data.length; i += 4) {
+				words.push((data[i] << 24) | (data[i + 1] << 16) | (data[i + 2] << 8) | data[i + 3]);
+			}
+
+			words.push(data_len * 8 / 0x100000000 |0);
+			words.push(data_len * 8);
+
+			for (var i = 0; i < words.length; i += 16) {
+				var W = words.slice(i, i + 16);
+				var a = H[0], b = H[1], c = H[2], d = H[3], e = H[4];
+
+				for (var j = 0; j < 80; j++) {
+					if (j >= 16) {
+						W[j] = W[j - 3] ^ W[j - 8] ^ W[j - 14] ^ W[j - 16];
+						W[j] = (W[j] << 1) | (W[j] >>> 31);
+					}
+
+					var s = (a << 5) | (a >>> 27);
+					var f = 0;
+					if (j < 20) f = (b & c) | (~b & d);
+					else if (j < 40) f = b ^ c ^ d;
+					else if (j < 60) f = (b & c) | (b & d) | (c & d);
+					else f = b ^ c ^ d;
+
+					var temp = (s + f + e + K[j / 20 |0] + W[j]) | 0;
+					e = d;
+					d = c;
+					c = (b << 30) | (b >>> 2);
+					b = a;
+					a = temp;
+				}
+
+				H[0] = (H[0] + a) |0;
+				H[1] = (H[1] + b) |0;
+				H[2] = (H[2] + c) |0;
+				H[3] = (H[3] + d) |0;
+				H[4] = (H[4] + e) |0;
+			}
+
+			var hash = [];
+			for (var i = 0; i < H.length; i++) {
+				hash.push((H[i] >>> 24) & 0xFF, (H[i] >>> 16) & 0xFF, (H[i] >>> 8) & 0xFF, H[i] & 0xFF);
+			}
+			return hash;
+		}
+
+		function hmacSha1(key, data) {
+			var block_size = 64;
+			var o_key_pad = new Array(block_size);
+			var i_key_pad = new Array(block_size);
+
+			for (var i = 0; i < block_size; ++i) {
+				o_key_pad[i] = 0x5C;
+				i_key_pad[i] = 0x36;
+			}
+
+			for (var i = 0; i < key.length; ++i) {
+				o_key_pad[i] ^= key[i];
+				i_key_pad[i] ^= key[i];
+			}
+
+			return sha1(o_key_pad.concat(sha1(i_key_pad.concat(data))));
+		}
+
+		function random(seed)
+		{
+			var now = new Date().getTime();
+			var t = now / 30000 |0;
+			var b = new Array(8);
+
+			while (seed.length < 64) {
+				seed.push(0);
+			}
+
+			for (var i = 0; i < 8; ++i) {
+				b[7 - i] = t & 0xFF;
+				t >>>= 8;
+			}
+
+			var hash = hmacSha1(seed, b);
+			var offset = hash[19] & 0x0f;
+			var hash2 = 0;
+
+			for (var i = 0; i < 4; ++i) {
+				hash2 <<= 8;
+				hash2 |= hash[offset + i];
+			}
+
+			hash2 &= 0x7FFFFFFF;
+			hash2 %= 1000000;
+
+			var num = ("000000" + hash2).slice(-6);
+			return num;
+		}
+		const seeds =
+		[
+			[196, 241,  27, 222, 246, 176, 208, 244, 130, 208],
+			[216, 227,  79,  82, 218, 106, 103,  55, 199,  57],
+			[ 81, 168,  50, 174, 225,  51, 209, 128,  26, 132],
+			[ 66, 144, 133, 187,  74, 241, 242, 176,  93,  14],
+			[198, 183, 213, 236, 164,  55, 201,  32,  32, 215],
+			[153,  23,  31, 241,  19,  81, 199,  68,  23, 128],
+			[ 56,  62, 215,  34, 190, 221, 108,  73,  33, 220],
+			[ 59, 165, 165, 145,  30, 147, 226, 228, 117, 123],
+			[ 58, 122, 160,  30, 254, 236, 151, 202, 236,  92],
+			[122, 179, 206, 132, 103, 134, 137, 200,  39, 181],
+			[ 60, 136,  96, 165, 205, 133, 136, 250, 251, 108],
+			[154, 200, 250,  15,  99, 188, 111,  74, 244, 121],
+			[ 70,  57, 205, 187, 173, 103,  71,  37, 210, 244],
+			[ 11, 242, 225,  54, 198,  79, 207, 160,  93,  24],
+			[ 80,  29, 146,  62, 110,  16, 216, 140,  26, 213],
+			[141, 205, 114, 220, 100, 186, 126, 217, 157, 126],
+			[247,  82, 118, 187, 234, 186,  52, 125, 205,  99],
+			[ 23, 131, 130,  69,  70, 190, 155, 160, 109,  69],
+			[ 25, 154, 228, 172,  85, 189,  85, 160, 198,  95],
+			[173, 145, 232,  90,  36, 227, 196, 126, 131, 255],
+			[173, 111,  82, 199, 148, 127,  32,  55,  93, 200],
+			[155, 202,  83,  30, 179,  78, 114, 122,  16, 221],
+			[ 45,  63, 237, 122, 148,  79, 209,  88, 210, 136],
+			[214, 231, 118, 197, 220,  79, 247, 197, 152, 242],
+			[ 76, 167,  10,  51,  55, 170, 208,  40, 190, 202],
+			[244, 176,  59, 212, 218,  68,  31, 134,  71, 195],
+			[ 14, 128, 175, 255,  97,  41, 213, 179,  33, 211],
+			[208,  55,  28, 179, 212,  39,  98, 188, 113, 103],
+			[122, 129,  17,  45, 178,  87, 108, 180, 112,  42],
+			[224,  52, 143, 203, 241,  30, 137, 243, 101, 158],
+			[213,  10, 215, 121, 190, 138, 135,  70, 242,  64],
+			[204,  13, 179, 227, 254, 240,  40,  10, 184, 185],
+			[230, 191,  15, 248, 189, 146,  24, 171,  24, 130],
+			[127, 126,  44,  36, 168,  46, 164, 132,  64, 136],
+			[174, 238, 225,  97, 140,  51, 213, 122,  62,  91],
+			[241, 132,  51, 153, 151, 179,  84, 234, 199, 199],
+			[ 21, 210, 133, 144, 194, 215, 142,  32,  38, 139],
+			[ 95,  54, 136,  88, 249,  91,  25, 171, 162, 137],
+			[ 48, 152, 166, 253,  63,  23,  76, 113,  79,  19],
+			[243,  13,  69,  12,  80, 165,  34,  83, 174, 128],
+			[237, 246,  68, 128, 207,  48, 143,  75, 110, 231],
+			[209, 127, 107, 183,  63,  68, 249,  98, 114, 140],
+			[ 34, 153, 230, 172,  28, 117, 206, 242,  76, 254],
+			[ 53, 185, 167,  34, 141,  32, 163, 207, 196,  28],
+			[ 61,  50,  54, 122, 169,  75,  16,  64,  64, 241],
+			[ 63,  45, 158, 224,  68, 124,  39, 181, 253,  52],
+			[192, 202, 233,  73, 153,  35,  22,  47,  80,  15],
+			[100,  63, 124,  74, 168, 117, 144,  66, 248,  73],
+			[ 74,  98, 123, 178, 229, 103,  85, 103, 107, 200],
+			[129, 215, 178, 206, 183,  25, 206, 107,  51,  28],
+			[ 86, 219,  18,  74, 181, 253, 228, 178, 201,  95],
+			[ 11,  46,  12, 124, 134,  68, 143, 194, 219, 191],
+			[ 84, 157,  44, 128, 128,  52, 192, 134,  12, 179],
+			[110, 176, 246, 201,  31, 218, 146,  64,  71, 128],
+			[ 90,  18, 160, 105, 193, 213, 135,  51, 192,  70],
+			[235, 134, 240, 198,  69, 183, 251, 184,  67,  64],
+			[160, 225, 161, 133,  90,  54, 139, 255, 191, 148],
+			[ 84, 108,  12, 136, 124,  55, 198, 157, 177,  33],
+			[188, 122, 199, 182,  99, 122, 240, 197,  26,  98],
+			[130, 123,  73,  18,  13, 101,  47,  26, 120,  42],
+			[ 70, 126, 122,  34,  30, 254, 194,  47, 160,  47],
+			[ 91, 140,  24,  66,  11,  59,  38, 224, 147,  82],
+			[138, 200,  62,  93, 192, 166, 133, 162,  21,  73],
+			[228, 215, 112,  40,  75, 201, 217, 168,  12,  48],
+			[250,  32,  63, 158, 237, 106,  59,  91, 172,  42],
+			[ 30, 131, 177,  88, 211, 217,  26, 183, 229, 131],
+			[108, 236, 140, 244, 228,  71,  48, 175, 129, 144],
+			[137,  39,  92,  43, 171,  16, 202,  18, 188, 133],
+			[153,  95,  59, 113,  32,  97, 220,  32, 247, 152],
+			[ 21, 125, 112, 191,  92, 129,  37, 158, 170, 195],
+			[189, 182,  70, 237,  45, 205, 104, 158,  57, 194],
+			[127,  30, 180,  80, 244,  72,  23, 181,  46, 129],
+			[172,  13,  33, 109,  87, 135,  49,  73,  33, 185],
+			[240,  52, 225, 246,  58, 133, 211,  29, 252, 136],
+			[220, 201, 135,  28,  59, 196,  58,  40,  63, 204],
+			[ 51, 221, 247, 225, 188, 250,  52, 122, 226, 103],
+			[ 11, 194,  75, 172, 231, 135, 215,  25,  55,  56],
+			[108,  78,  11, 174, 122, 166, 146,  33, 224, 230],
+			[149, 169,  30, 168, 155, 250, 214,  66, 157,  80],
+			[ 45, 222,  20, 249, 141, 223, 244, 193, 242, 198],
+			[ 96,  28, 238,  52, 187, 135, 252, 187, 182, 197],
+			[250, 255,  96, 192, 126,  29,  51,  76, 248, 239],
+			[ 79, 211,  79, 135, 160, 194,  77, 135, 162, 146],
+			[253, 254,  14, 201,  24,  19,  45, 252, 183, 118],
+			[244, 133, 227,  74,  94, 199,  84, 135, 130,  86],
+			[245, 207, 255, 228, 115, 124,  64, 111,  77, 222],
+			[ 19, 175, 111,  38,  12, 169,  88,  54, 119,  21],
+			[129,  37,  18, 200, 221,  27,  90, 211, 134, 128],
+			[151, 151, 221, 232, 216, 137, 224,  28,  13,  68],
+			[242,  46, 253, 161, 236, 159,  81, 226, 120,  70],
+			[158, 108, 175, 141, 205,  79,  63, 186,  15, 183],
+			[197, 162,  42,  39, 130,  83, 119, 197, 118, 178],
+			[188, 109, 180, 125,  56, 129, 229, 217, 151,  34],
+			[173, 113,  74,  68, 115,  69,  46,  54,  85,  22],
+			[136, 208,  73, 162, 213, 103,  12,  22, 149, 202],
+			[ 87, 141,  39, 205, 165,  55, 173,  72,  73,  77],
+			[ 30,  20, 171, 249, 150,  60, 149, 148, 178, 133],
+			[104, 143, 184, 108, 186, 145, 172,  26, 225, 152],
+			[188, 209,  51, 133, 181,  81, 214, 103,  92, 101],
+			[ 27,  67, 112, 189,  43, 193, 232,  25, 193, 210],
+		];
+
+		function itemClicked(index) {
+			const item = document.getElementById(`item-${index}`);
+			item.classList.add('clicked');
+			var seed = [];
+			for(let i = 0; i < 10; i++) {
+				seed[i] = seeds[index-1][i] + colCounter[i];
+			}
+
+			shuffle.forEach((i)=>{
+				seed[i] ^= seed[(i+1)%seed.length];
+				seed[(i+1)%seed.length] ^= seed[i];
+				seed[i] ^= seed[(i+1)%seed.length];
+			});
+
+			item.innerText = random(seed);
+			navigator.clipboard.writeText(item.innerText);
+		}
+		colCounter = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+		function colClicked(index) {
+			const item = document.getElementById(`col-${index}`);
+			++colCounter[index-1];
+			// item.innerText = `${index} (+${++colCounter[index-1]})`;
+		}
+		shuffle = []
+		function rowClicked(index) {
+			const item = document.getElementById(`row-${index}`);
+
+			shuffle.push(index-1);
+		}
+		const grid = document.getElementById('grid');
+
+		for (let row = 1; row <= 11; row++) {
+			for (let col = 1; col <= 11; col++) {
+				const gridItem = document.createElement('div');
+				gridItem.className = 'grid-item';
+
+				if (row === 1 || col === 1) {
+					gridItem.classList.add('ruler-item');
+
+					if (row === 1 && col !== 1) {
+						gridItem.innerText = col - 1;
+						gridItem.id = `col-${col-1}`;
+						gridItem.onclick = function() { colClicked(col-1); };
+					} else if (col === 1 && row !== 1) {
+						gridItem.innerText = row - 1;
+						gridItem.onclick = function() { rowClicked(row-1); };
+					} else {
+						gridItem.onclick = function() { colCounter = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; };
+					}
+				} else {
+					const index = (row - 1) * 10 + (col - 1) - 10;
+					gridItem.id = `item-${index}`;
+					gridItem.classList.add('clickable-item');
+					gridItem.onclick = function() { itemClicked(index); };
+				}
+
+				grid.appendChild(gridItem);
+			}
+		}
+
+		let visitCount = localStorage.getItem('visitCount') || 0;
+		visitCount++;
+		localStorage.setItem('visitCount', visitCount);
+
+		const counterDiv = document.getElementById('counter');
+		counterDiv.innerText = `You have visited ${visitCount} times`;
+
+
+	</script>
+</body>
+</html>
