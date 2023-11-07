@@ -114,6 +114,18 @@
 		marquee {
 			font-size: 24px;
 		}
+		@keyframes tada {
+		  from {
+		    clip-path: circle(0% at 50% 50%);
+		  }
+		  to {
+		    clip-path: circle(100% at 50% 50%);
+		  }
+		}
+
+		body {
+		  animation: tada 1.618s ease-out forwards;
+		}
 	</style>
 </head>
 <body>
